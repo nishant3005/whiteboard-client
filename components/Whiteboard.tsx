@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 
 interface WhiteboardProps {
   roomId: string;
@@ -9,7 +9,7 @@ interface WhiteboardProps {
 
 const Whiteboard: React.FC<WhiteboardProps> = ({ roomId }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const socketRef = useRef<any>(null);
+  const socketRef = useRef<Socket | null>(null);
   const isDrawingRef = useRef(false);
   const [color, setColor] = useState('#000000');
 
@@ -52,15 +52,35 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ roomId }) => {
         });
       });
 
-    socketRef.current.on('draw', (data: any) => {
-      drawLine(data.x0, data.y0, data.x1, data.y1, data.color);
-    });
+    socketRef.current.on(
+      'draw',
+      (data: {
+        x0: number;
+        y0: number;
+        x1: number;
+        y1: number;
+        color: string;
+      }) => {
+        drawLine(data.x0, data.y0, data.x1, data.y1, data.color);
+      }
+    );
 
-    socketRef.current.on('load-canvas', (data: any[]) => {
-      data.forEach((line) => {
-        drawLine(line.x0, line.y0, line.x1, line.y1, line.color);
-      });
-    });
+    socketRef.current.on(
+      'load-canvas',
+      (
+        data: {
+          x0: number;
+          y0: number;
+          x1: number;
+          y1: number;
+          color: string;
+        }[]
+      ) => {
+        data.forEach((line) => {
+          drawLine(line.x0, line.y0, line.x1, line.y1, line.color);
+        });
+      }
+    );
 
     return () => {
       socketRef.current.disconnect();
