@@ -1,23 +1,23 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { io, Socket } from 'socket.io-client';
+import { io } from 'socket.io-client';
 
-interface WhiteboardProps {
-  roomId: string;
-}
+// interface WhiteboardProps {
+//   roomId: string;
+// }
 
-interface LineData {
-  x0: number;
-  y0: number;
-  x1: number;
-  y1: number;
-  color: string;
-}
+// interface LineData {
+//   x0: number;
+//   y0: number;
+//   x1: number;
+//   y1: number;
+//   color: string;
+// }
 
-const Whiteboard: React.FC<WhiteboardProps> = ({ roomId }) => {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const socketRef = useRef<Socket | null>(null);
+const Whiteboard = ({ roomId }) => {
+  const canvasRef = useRef(null);
+  const socketRef = useRef(null);
   const isDrawingRef = useRef(false);
   const [color, setColor] = useState('#000000');
 
@@ -34,13 +34,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ roomId }) => {
     canvas.height = window.innerHeight * dpr;
     ctx.scale(dpr, dpr);
 
-    const drawLine = (
-      x0: number,
-      y0: number,
-      x1: number,
-      y1: number,
-      color: string
-    ) => {
+    const drawLine = (x0, y0, x1, y1, color) => {
       ctx.strokeStyle = color;
       ctx.beginPath();
       ctx.moveTo(x0, y0);
@@ -54,17 +48,17 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ roomId }) => {
 
     fetch(`https://whiteboard-server-425a.onrender.com/rooms/${roomId}`)
       .then((res) => res.json())
-      .then((data: LineData[]) => {
-        data.forEach((line: LineData) => {
+      .then((data) => {
+        data.forEach((line) => {
           drawLine(line.x0, line.y0, line.x1, line.y1, line.color);
         });
       });
 
-    socketRef.current?.on('draw', (data: LineData) => {
+    socketRef.current?.on('draw', (data) => {
       drawLine(data.x0, data.y0, data.x1, data.y1, data.color);
     });
 
-    socketRef.current?.on('load-canvas', (data: LineData[]) => {
+    socketRef.current?.on('load-canvas', (data) => {
       data.forEach((line) => {
         drawLine(line.x0, line.y0, line.x1, line.y1, line.color);
       });
@@ -83,7 +77,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ roomId }) => {
     let lastX = 0,
       lastY = 0;
 
-    const startDrawing = (clientX: number, clientY: number) => {
+    const startDrawing = (clientX, clientY) => {
       if (!canvasRef.current) return;
       const rect = canvasRef.current.getBoundingClientRect();
       lastX = clientX - rect.left;
@@ -91,7 +85,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ roomId }) => {
       isDrawingRef.current = true;
     };
 
-    const draw = (clientX: number, clientY: number) => {
+    const draw = (clientX, clientY) => {
       if (!isDrawingRef.current || !canvasRef.current) return;
 
       const rect = canvasRef.current.getBoundingClientRect();
