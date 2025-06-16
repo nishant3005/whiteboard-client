@@ -7,6 +7,14 @@ interface WhiteboardProps {
   roomId: string;
 }
 
+interface LineData {
+  x0: number;
+  y0: number;
+  x1: number;
+  y1: number;
+  color: string;
+}
+
 const Whiteboard: React.FC<WhiteboardProps> = ({ roomId }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const socketRef = useRef<Socket | null>(null);
@@ -46,41 +54,21 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ roomId }) => {
 
     fetch(`https://whiteboard-server-425a.onrender.com/rooms/${roomId}`)
       .then((res) => res.json())
-      .then((data) => {
-        data.forEach((line: any) => {
+      .then((data: LineData[]) => {
+        data.forEach((line: LineData) => {
           drawLine(line.x0, line.y0, line.x1, line.y1, line.color);
         });
       });
 
-    socketRef.current.on(
-      'draw',
-      (data: {
-        x0: number;
-        y0: number;
-        x1: number;
-        y1: number;
-        color: string;
-      }) => {
-        drawLine(data.x0, data.y0, data.x1, data.y1, data.color);
-      }
-    );
+    socketRef.current.on('draw', (data: LineData) => {
+      drawLine(data.x0, data.y0, data.x1, data.y1, data.color);
+    });
 
-    socketRef.current.on(
-      'load-canvas',
-      (
-        data: {
-          x0: number;
-          y0: number;
-          x1: number;
-          y1: number;
-          color: string;
-        }[]
-      ) => {
-        data.forEach((line) => {
-          drawLine(line.x0, line.y0, line.x1, line.y1, line.color);
-        });
-      }
-    );
+    socketRef.current.on('load-canvas', (data: LineData[]) => {
+      data.forEach((line) => {
+        drawLine(line.x0, line.y0, line.x1, line.y1, line.color);
+      });
+    });
 
     return () => {
       socketRef.current.disconnect();
