@@ -3,18 +3,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { io } from 'socket.io-client';
 
-// interface WhiteboardProps {
-//   roomId: string;
-// }
-
-// interface LineData {
-//   x0: number;
-//   y0: number;
-//   x1: number;
-//   y1: number;
-//   color: string;
-// }
-
 const Whiteboard = ({ roomId }) => {
   const canvasRef = useRef(null);
   const socketRef = useRef(null);
