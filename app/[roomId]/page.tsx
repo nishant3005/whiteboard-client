@@ -2,17 +2,11 @@
 
 import dynamic from 'next/dynamic';
 
-type Props = {
-  params: {
-    roomId: string;
-  };
-};
-
-const Whiteboard = dynamic(() => import('../../components/Whiteboard'), {
+const Whiteboard = dynamic(() => import('@/components/Whiteboard'), {
   ssr: false,
 });
 
-export default function Room({ params }: Props) {
+export default function RoomPage({ params }) {
   return (
     <div className="flex justify-center items-center h-screen">
       <Whiteboard roomId={params.roomId} />

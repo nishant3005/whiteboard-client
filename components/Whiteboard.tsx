@@ -50,7 +50,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ roomId }) => {
 
     socketRef.current = io('https://whiteboard-server-425a.onrender.com');
 
-    socketRef.current.emit('join', roomId);
+    socketRef.current?.emit('join', roomId);
 
     fetch(`https://whiteboard-server-425a.onrender.com/rooms/${roomId}`)
       .then((res) => res.json())
@@ -60,18 +60,18 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ roomId }) => {
         });
       });
 
-    socketRef.current.on('draw', (data: LineData) => {
+    socketRef.current?.on('draw', (data: LineData) => {
       drawLine(data.x0, data.y0, data.x1, data.y1, data.color);
     });
 
-    socketRef.current.on('load-canvas', (data: LineData[]) => {
+    socketRef.current?.on('load-canvas', (data: LineData[]) => {
       data.forEach((line) => {
         drawLine(line.x0, line.y0, line.x1, line.y1, line.color);
       });
     });
 
     return () => {
-      socketRef.current.disconnect();
+      socketRef.current?.disconnect();
     };
   }, [roomId]);
 
@@ -98,7 +98,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ roomId }) => {
       const x = clientX - rect.left;
       const y = clientY - rect.top;
 
-      socketRef.current.emit('draw', {
+      socketRef.current?.emit('draw', {
         roomId,
         x0: lastX,
         y0: lastY,
@@ -160,7 +160,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ roomId }) => {
 
   const handleSave = () => {
     if (roomId) {
-      socketRef.current.emit('save', roomId);
+      socketRef.current?.emit('save', roomId);
       alert('Canvas saved!');
     }
   };
