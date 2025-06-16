@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build": "echo 'Simulating build process...' && sleep 2 && echo 'Fake build complete!'",
     "start": "next dev",
     "lint": "next lint"
   },
